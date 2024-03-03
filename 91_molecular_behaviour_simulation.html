@@ -1,0 +1,196 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Molecular Behaviour Simulation</title>
+
+        <style>
+            h1 {
+                color: #fff;
+            }
+            body {
+                margin: 0;
+
+                /*Overflow clipped*/
+                overflow: hidden;
+                background-color: #000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                /*viewport height*/
+                height: 100vh;
+            }
+
+            /*ID selector*/
+            #container-wrapper { 
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #container-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #particle-container {
+                position: relative;
+                width: 80vw;
+                height: 60vh;
+                border: 2px solid #fff;
+                overflow: hidden;
+            }
+
+            /*Class selector*/
+            .particle { 
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background-color: #fff;
+                border-radius: 50%;
+            }
+
+            #controls {
+                margin-top: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            label {
+                color: #fff;
+
+                /*Distance from neighbour along bottom*/
+                margin-bottom: 5px;
+            }
+
+            input {
+                width: 80%;
+                margin-bottom: 10px;
+            }
+
+            #vibration-meter {
+                width: 200%;
+                height: 20px;
+                background-color: #ffaa;
+                position: relative;
+                overflow: hidden;
+            }
+
+            #vibration-level {
+                width: 20%;
+                height: 100%;
+                background-color: #0f0;
+                overflow: hidden;
+
+                /* Ease = Slow, then fast, then slow*/
+                transition: width 0.2s ease;
+            }
+
+            #temperature-value {
+                color: #fff;
+            }
+
+        </style>
+    </head>
+    <h1>Molecular Behaviour Simulation</h1>
+    
+    <body>
+        <div id="container-wrapper">
+            <div id="particle-container">
+        </div>
+
+        <div id="controls">
+            <label for="temperature">Temperature (°C)</label>
+            <input type="range" id="temperature" min="1" max="100" value="20">
+
+            <!--Inline container-->
+            <span id="temperature-value">20°C</span>
+    
+
+        <div id="vibration-meter">
+            <div id="vibration-level"></div>
+        </div>
+        </div>
+        </div>
+
+        <script>
+            const numberOfParticles = 100;
+            const particles = [];
+
+            const particleContainer = document.getElementById('particle-container');
+            const temperatureInput = document.getElementById('temperature');
+            const temperatureValue = document.getElementById('temperature-value');
+            const vibrationLevel = document.getElementById('vibration-level');
+
+            //Event listener adds function to an event (type, function)
+            temperatureInput.addEventListener('input', function() {  
+                temperatureValue.textContent = `${temperatureInput.value}°C`;
+            });
+
+            for (let i = 0; i < numberOfParticles; i++) {
+                createParticle();
+            }
+
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particleContainer.appendChild(particle);
+                resetParticle(particle);
+                particles.push({ element: particle, x: 400, y: 200, speedX: 0, speedY: 0 });
+            }
+
+            //Generate a random position for each particle
+            //to fit within the particle-container
+            function resetParticle(particle) {
+                const initialX = Math.random() * particleContainer.offsetWidth;
+                const initialY = Math.random * particleContainer.offsetHeight;
+                
+                //Moves the element by the specified amount along x and y axes.
+                particle.style.transform = `translate(${initialX}px, ${initialY}px)`;
+            }
+
+            function updateParticles() {
+                let totalSpeed = 0;
+
+                //Updates speed for each particle
+                particles.forEach(particle => {
+                    const temperature = temperatureInput.value;
+                    particle.speedX = (Math.random() - 0.5) * temperature;
+                    particle.speedY = (Math.random() - 0.5) * temperature;
+
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+
+                    //Calculate absolute value of speed, regardless of direction
+                    //Provides a cumulative measure of how fast each particle is travelling
+                    totalSpeed += Math.abs(particle.speedX) + Math.abs(particle.speedY);
+
+                    if (particle.x > particleContainer.offsetWidth || particle.x < 0 || particle.y > particleContainer.offsetHeight || particle.y < 0) {
+                        resetParticle(particle.element);
+                    }
+
+                    particle.element.style.transform = `translate(${particle.x}px, ${particle.y}px)`;
+                    
+                });
+
+            const averageSpeed = totalSpeed / particles.length;
+            const vibrationPercentage = (averageSpeed / 50) * 100;
+
+            vibrationLevel.style.width = `${vibrationPercentage}%`;
+
+            requestAnimationFrame(updateParticles);
+        }
+
+        updateParticles();
+
+        </script>
+        
+    </body>
+    </html>
