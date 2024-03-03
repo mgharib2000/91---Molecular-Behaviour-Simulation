@@ -8,3 +8,5 @@ Features:-
 - Interactive slider control to adjust temperature settings.
 - Real-time visualization of molecular movements.
 - User-friendly interface with intuitive controls.
+
+![Molecular Behaviour Selection](https://github.com/mgharib2000/91---Molecular-Behaviour-Simulation/assets/83606701/58a62ae2-62cc-4cef-bd40-a770d0b8e079)
